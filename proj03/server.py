@@ -5,6 +5,8 @@
 # Date: 24 June 2021
 # Original author: Victor Norman at Calvin University
 #
+# Edited by Sean Ebenmelu
+# Date: 10/13/2021
 
 import asyncio
 import websockets
@@ -19,12 +21,6 @@ PORT = 8001
 # TODO: need a variable here to hold all connected clients' websocket objects.
 sockets = []
 
-<<<<<<< HEAD
-=======
-def getClientID(socketArr, sock):
-    return socketArr.index(sock)
-
->>>>>>> a5cef4ffe0b4a45d4ae367a6227a547362f57dca
 def register_new_client(client_ws):
     if DEBUG:
         print('register new client!')
@@ -48,33 +44,31 @@ async def per_client_handler(client_ws, path):
             # This next line assumes that the message we received is a stringify-ed
             # JSON object.  data will be a dictionary.
             data = json.loads(message)
-<<<<<<< HEAD
 
             # TODO: Add the client's unique id to the message before
             # sending to everyone.
+            
+            # Adapted from Brian L.'s code
             data['id'] = sockets.index(client_ws)   # returns the index of client_ws and assigns to data['id']
 
             print('got data ', data)
-=======
-            data['id'] = sockets.index(client_ws)
+            
+            data['id'] = sockets.index(client_ws) # Adapted from Brian's code
 
             print('got data ', data)
 
             # TODO: Add the client's unique id to the message before
-            # sending to everyone.
->>>>>>> a5cef4ffe0b4a45d4ae367a6227a547362f57dca
+            # sending to everyone
 
             # TODO: Send received message to all *other* clients.
             json_data = json.dumps(data)
             for client in sockets:
                 if client is not client_ws:
                     print(client)
-<<<<<<< HEAD
-                    await client.send(json_data)    # waits for client input
-=======
-                    await client.send(json_data)
->>>>>>> a5cef4ffe0b4a45d4ae367a6227a547362f57dca
 
+                    await client.send(json_data)    # waits for client input
+
+                    await client.send(json_data)
 
     finally:
         unregister_client(client_ws)
@@ -99,8 +93,5 @@ start_server = websockets.serve(per_client_handler, "localhost", PORT)
 # start_server = websockets.serve(per_client_handler, getNetworkIp(), PORT)
 
 asyncio.get_event_loop().run_until_complete(start_server)
-<<<<<<< HEAD
 asyncio.get_event_loop().run_forever()
-=======
 asyncio.get_event_loop().run_forever()
->>>>>>> a5cef4ffe0b4a45d4ae367a6227a547362f57dca
