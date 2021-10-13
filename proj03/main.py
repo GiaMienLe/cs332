@@ -1,3 +1,7 @@
+# Edited by Sean Ebenmelu
+# Date: 10/13/2021
+# 
+# Client-side code for whiteboard program
 
 from browser import document, html, DOMEvent, websocket
 from javascript import JSON
@@ -31,6 +35,8 @@ def handle_mousemove(ev: DOMEvent):
 
     # This is the first event or the mouse is being moved without a button
     # being pushed -- don't draw anything, but record where the mouse is.
+    
+    # code was adapted from Darren's
     if my_lastx is None or ev.buttons == 0:
         my_lastx = ev.x
         my_lasty = ev.y
@@ -46,6 +52,8 @@ def handle_mousemove(ev: DOMEvent):
         ctx.stroke()
 
         # TODO: send data to server.
+        # code was adapted from Darren's
+        
         ws.send(JSON.stringify({
             'x': ev.x, 
             'y': ev.y, 
