@@ -17,10 +17,6 @@ color_choice = 'black'      # default value
 # as the machine on which the websockets server is running.
 server_ip = document.location.host.split(':')[0]
 
-
-# TODO: store last_x and last_y values *for each client* in some data structure
-# defined here.
-# lastPos = {'x': my_lastx, 'y': my_lasty}
 client = {}
 
 def handle_mousemove(ev: DOMEvent):
@@ -63,7 +59,7 @@ def handle_mousemove(ev: DOMEvent):
         my_lastx = ev.x
         my_lasty = ev.y
 
-
+# code was adapted from Caleb Hurshman and Darren
 def handle_other_client_data(data):
     # TODO: you, gentle student, need to provide the code here. It is
     # very similar in structure to handle_mousemove() above -- but there
@@ -81,7 +77,6 @@ def handle_other_client_data(data):
         this_cli['lasty'] = data['y']
     else:
         # draws data of other client
-        a5cef4ffe0b4a45d4ae367a6227a547362f57dca
         ctx.moveTo(data['lastx'], data['lasty'])
         ctx.lineTo(data['x'], data['y'])
         ctx.strokeStyle = data['color']
