@@ -69,33 +69,25 @@ def handle_other_client_data(data):
     # very similar in structure to handle_mousemove() above -- but there
     # are some logical differences.
     
-<<<<<<< HEAD
     client[data['id']] = data   # adds clients to client list with each their own data dict
     this_cli = client[data['id']] # current cli
 
     # if current client isn't drawing
-=======
     client[data['id']] = data
     this_cli = client[data['id']]
 
->>>>>>> a5cef4ffe0b4a45d4ae367a6227a547362f57dca
     if data['lastx'] is None or data['color'] is None:
         this_cli['lastx'] = data['x']
         this_cli['lasty'] = data['y']
     else:
-<<<<<<< HEAD
         # draws data of other client
-=======
->>>>>>> a5cef4ffe0b4a45d4ae367a6227a547362f57dca
+        a5cef4ffe0b4a45d4ae367a6227a547362f57dca
         ctx.moveTo(data['lastx'], data['lasty'])
         ctx.lineTo(data['x'], data['y'])
         ctx.strokeStyle = data['color']
         ctx.stroke()
-<<<<<<< HEAD
 
         # returns the mouse to original position
-=======
->>>>>>> a5cef4ffe0b4a45d4ae367a6227a547362f57dca
         this_cli['lastx'] = data['x']
         this_cli['lasty'] = data['y']
 
@@ -147,9 +139,5 @@ document <= server_txt_input
 
 ws = websocket.WebSocket(f"ws://{server_ip}:{SERVER_PORT}/")
 ws.bind('message', on_mesg_recv)
-<<<<<<< HEAD
-
 
 # answers in answers.md
-=======
->>>>>>> a5cef4ffe0b4a45d4ae367a6227a547362f57dca
