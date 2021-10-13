@@ -1,4 +1,6 @@
-1. To enable an erase function, you could simply change the color of the mouse to the background color, and also increase the cursor size. 
+1. 
+
+To enable an erase function, you could simply change the color of the mouse to the background color, and also increase the cursor size. 
 
 
 <!-- inspired from 
