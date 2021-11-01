@@ -2,49 +2,43 @@ import sys, socket
 
 HOST = 'localhost'
 PORT = 65432
+BUFFER = 1450
 
 class Receiver:
-    def __init__(self, port=0, filename=''):
+    # Receiver Constructor
+    def __init__(self, port, filename):
         self.port = port
         self.filename = filename
     
-    # TODO: Open a FileOutputStream
-    def writeBytes(self, byteArray):
-        with open(self.filename, "w") as file:
-            for stuff in byteArray:
-                file.write(stuff)
-
+    # Run receiver
     def run(self):
-        receiveBytes = []
 
-        # Open the socket on the given port.
-        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
-            sock.bind(('', self.port))
-            message, address = sock.recvfrom(PORT)
+        # write to a file what is received from sender
+        file = open(self.filename, 'wb')
 
-            packetSize = int (message.decode('utf-8'))
-            counter = 0
-            # print(i)
-            while True:
-                message, address = sock.recvfrom(PORT)
-                receiveBytes.append(message)
+        # Open a datagram socket on the given port.
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sock.bind((HOST, PORT)) # bind to socket
 
-                counter += 1
-                if counter == packetSize:
+        while True:
+            message, address = sock.recvfrom(BUFFER + 12)
+            sock.settimeout(2)
+
+            if message:
+                print(message)
+                file.write(message[12:])
+
+                connectID = message[:4] 
+                pktID = message[8:12]
+                ackPkt = connectID + pktID
+
+            # sends an ACK
+                sock.sendto(ackPkt, address)
+
+                if len(message) != (BUFFER + 12):
                     break
-
-        # input bytes into recieveBytes []
-        temp = []
-        for bytStuff in receiveBytes:
-            temp.append(bytStuff.decode())
-
-        receiveBytes = temp
-        del temp
-
-        writeBytes(receiveBytes)
-
-        result = ''.join(receiveBytes)
-        # print(result)
+        file.close()
+        sock.close()
 
 thisReceiver = Receiver(PORT, 'foo2.txt')
 thisReceiver.run()

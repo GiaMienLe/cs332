@@ -1,72 +1,60 @@
-import sys, socket
-
-byteArr = []
+import sys, socket, os
 
 HOST = 'localhost'
 PORT = 65432
+BUFFER = 1450
 
 class Sender:
-    def __init__(self, destAddress="", port=0, filename=""):
+    # Sender Constructor
+    def __init__(self, destAddress=HOST, port=PORT, filename="foo.txt"):
         self.destAddress = destAddress
         self.port = port
         self.filename = filename
 
-    # Figure out how to read the file contents into a byte[]
 
-    def readFile(self, filename):
-        # print("\nFile Read: ")
-        packetLimit = 1450
-        counter = 0
-        with open(filename, "r") as file:
-            # TODO: find a more efficient way of doing this
-            for line in file:
-                for c in line:
-                    if counter < packetLimit:
-                        byteArr.append(bytes(c.encode()))
-                        counter += 1
-                    else:
-                        # self.sendBytes()
-                        # byteArr.clear()     # clear packet
-                        # counter = 0         # reset count, 
-                        pass
-        # print byteArr
-        # for c in byteArr:
-        #     print(c)
+# read and send file
+def readSendFile(filename):
+    pktID = 0
 
-    def getByteArr(self):
-        return byteArr
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-    def sendBytes(self):
-        # Open a datagram socket and handles sock.close().
+        # read file into binary form and store in data var
+    file = open(filename, 'rb')
 
-        # with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
-        #     packetSize = str(len(self.getByteArr()))    # will be given to receiver to stop server
+    try:
+        while True:
+            data = file.read(BUFFER)
 
-        #     sock.sendto(bytes(packetSize.encode()), (HOST, PORT))
+            if len(data) == 0:
+                break
 
-        #     for bStuff in self.getByteArr():
-        #         sock.sendto(bStuff, (HOST, PORT))
+            # Header
+            connectID = os.urandom(4) # assigns unsigned random numbers
+            numOfBytes = len(data).to_bytes(4, 'big')
 
-        pass
+            header = connectID + numOfBytes + pktID.to_bytes(4, 'big')
+            print("Sending packet with size of: {}".format(len(header + data)))
 
-print(str(sys.argv))
+            sock.sendto(header + data, (HOST, PORT))
+            sock.settimeout(5)
 
+            # Wait for ACK packet
+            ackPkt, address = sock.recvfrom(8)
+            print("ACK Message Len: {} bytes received from -- {}".format(len(ackPkt), address))
+
+            pktID += 1
+    except KeyboardInterrupt:
+        print("\b\b\n-------------------------")
+        file.close()
+        sock.close()
+
+# if cmd args are less than 2, use default Sender object
 if len(sys.argv) < 2:
     thisSender = Sender()
+    readSendFile(thisSender.filename)
 else:
     dest = sys.argv[1]
     portNum = int(sys.argv[2])
     a_file = sys.argv[3]
     thisSender = Sender(dest, portNum, a_file)
-
-# Use socket.getByName() to convert the destAddress IP Address.
-ip_addr = socket.gethostbyname(HOST)
-print(ip_addr)
-
-with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
-    packetSize = str(len(thisSender.getByteArr()))    # will be given to receiver to stop server
-
-    sock.sendto(bytes(packetSize.encode()), (HOST, PORT))
-
-    for bStuff in thisSender.getByteArr():
-        sock.sendto(bStuff, (HOST, PORT))
+    readSendFile(a_file)
