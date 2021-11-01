@@ -21,21 +21,22 @@ class Receiver:
         sock.bind((HOST, PORT)) # bind to socket
 
         while True:
-            message, address = sock.recvfrom(BUFFER + 12)
+            message, address = sock.recvfrom(BUFFER + 13)
             sock.settimeout(2)
 
             if message:
-                print(message)
-                file.write(message[12:])
+                file.write(message[13:])
 
                 connectID = message[:4] 
                 pktID = message[8:12]
                 ackPkt = connectID + pktID
+                is_acked = message[12]
+                print(is_acked)
 
             # sends an ACK
                 sock.sendto(ackPkt, address)
 
-                if len(message) != (BUFFER + 12):
+                if len(message) != (BUFFER + 13):
                     break
         file.close()
         sock.close()
