@@ -18,7 +18,7 @@ class Receiver:
 
         # Open a datagram socket on the given port.
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        sock.bind((HOST, PORT)) # bind to socket
+        sock.bind(('', PORT)) # bind to socket
 
         while True:
             message, address = sock.recvfrom(BUFFER + 13)
@@ -30,8 +30,9 @@ class Receiver:
                 connectID = message[:4] 
                 pktID = message[8:12]
                 ackPkt = connectID + pktID
-                is_acked = message[12]
-                print(is_acked)
+
+                pktID = int.from_bytes(pktID, 'big')
+                print("Packet {} received".format(pktID))
 
             # sends an ACK
                 sock.sendto(ackPkt, address)
@@ -41,5 +42,9 @@ class Receiver:
         file.close()
         sock.close()
 
-thisReceiver = Receiver(PORT, 'foo2.txt')
-thisReceiver.run()
+if len(sys.argv) < 2:
+    thisReceiver = Receiver(PORT, 'foo2.txt')
+    thisReceiver.run()
+else:
+    thisReceiver = Receiver(sys.argv[1], sys.argv[2])
+    thisReceiver.run()
