@@ -24,21 +24,25 @@ class Receiver:
             message, address = sock.recvfrom(BUFFER + 13)
             sock.settimeout(2)
 
-            if message:
-                file.write(message[13:])
+            try:
+                if message:
+                    file.write(message[13:])
 
-                connectID = message[:4] 
-                pktID = message[8:12]
-                ackPkt = connectID + pktID
+                    connectID = message[:4] 
+                    pktID = message[8:12]
+                    ackPkt = connectID + pktID
 
-                pktID = int.from_bytes(pktID, 'big')
-                print("Packet {} received".format(pktID))
+                    pktID = int.from_bytes(pktID, 'big')
+                    print("\033[32mPacket {} received\033[0m".format(pktID))
 
-            # sends an ACK
-                sock.sendto(ackPkt, address)
+                # sends an ACK
+                    sock.sendto(ackPkt, address)
 
-                if len(message) != (BUFFER + 13):
-                    break
+                    if len(message) != (BUFFER + 13):
+                        break
+            except KeyboardInterrupt:
+                print("Receiver closed")
+                exit(1)
         file.close()
         sock.close()
 

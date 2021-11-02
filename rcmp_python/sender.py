@@ -57,14 +57,14 @@ class Sender:
 
                         marker = file.tell()    # gets current position
                             
-                        print("ACK Message Len: {} bytes received".format(len(ackPkt)))
+                        print("\033[32mACK Message Len: {} bytes received\033[0m".format(len(ackPkt)))
 
                         gap_counter += 1
                         pktSentSinceLastAck = 0
                     break
                 except socket.timeout:
-                    if x == 6:
-                        print("Client disconnected:  File transfer failed")
+                    if x == 4:
+                        print("\033[91mFile transfer success unknown.\033[0m")
                         exit(1)
                     print("Sender Timeout: No ACK was received")
                     file.seek(marker)
@@ -81,7 +81,8 @@ class Sender:
 if len(sys.argv) < 2:
     thisSender = Sender()
     thisSender.readSendFile()
-
+    
+# if cmd args are less than 2, use default Sender object
 else:
     dest = sys.argv[1]
     portNum = int(sys.argv[2])
