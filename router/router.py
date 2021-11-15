@@ -2,6 +2,7 @@ from l3packet import L3Packet
 from l3addr import L3Addr
 from routing_table import RoutingTable
 from l3interface import L3Interface
+from utils import maskToHostMask, maskToInt
 
 
 class Router:
@@ -11,25 +12,57 @@ class Router:
 
     def add_interface(self, iface: L3Interface):
         self._ifaces.append(iface)
-        # TODO: add an interface route to routing tabl
-        pass
+        # add an interface route to routing table
+        self._routing_table.add_iface_route(iface.get_number(), iface.get_netaddr(), iface.get_mask(), L3Addr("0.0.0.0"))
 
     def route_packet(self, pkt: L3Packet, incoming_iface: L3Interface) -> int:
         '''Route the given packet that arrived on the given interface (iface == None
         if the packet originated on this device). Return the interface # it was sent out,
         or None, if dropped or accepted to be processed on this host.'''
 
-        # TODO: implement this.
         # Check the following and drop pkt if any are true:
-        #   bcast packets (including directed bcast)
         #   dest on same network as packet arrived on: drop
-        # If dest addr is one of the interfaces, accept and do not forward.
         # Decrement ttl and if 0, drop.
+
+        #   bcast packets (including directed bcast): drop
+        if pkt.dest == L3Addr('255.255.255.255'):
+            print(f'Dropped {pkt}: BROADCAST PKT...')
+            return None
+
         # Get best route entry. Return the interface number of best match.
+        entry = self._routing_table.get_best_route(pkt.dest)
+        if entry == None:
+            return None
 
-        # NOTE: print out what the algorithm is doing just before each return statement.
-        # e.g., print(f"{pkt} accepted because dest matches iface {iface.get_number()}")
+        #   directed bcast handling: drop
+        if entry.destaddr.as_int() & maskToInt(entry.mask_numbits) | (maskToHostMask(entry.mask_numbits)) == pkt.dest.as_int():
+            print(f'Dropped {pkt}: DIRECTED BROADCAST...')
+            return None     
+        
+        
+        if entry == None:
+            print("Route Calculation Error")
+            return None
 
+        #   dest on same network as packet arrived on: drop
+        if incoming_iface.get_number() == entry.iface_num:
+            print(f'Dropped {pkt}: dest on same network as packet arrived on...')
+            return None
+
+        # Decrement ttl and if 0, drop.
+        pkt.ttl -= 1
+        if pkt.ttl == 0:
+            print(f'Dropped {pkt}: Exceeded Time To Live...Die')
+            return None
+
+        # If dest addr is one of the interfaces, accept and do not forward.
+        for iface in self._ifaces:
+            if (iface.get_number() == entry.iface_num) and \
+                (iface.get_addr().as_int() == pkt.dest.as_int()):
+                print(f'{pkt} accepted due to match with iface {entry.iface_num}')
+                return None
+
+        # Get best route entry. Return the interface number of best match.
         print(f'{pkt} routed to interface {entry.iface_num}')
         return entry.iface_num
 

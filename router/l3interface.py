@@ -16,21 +16,15 @@ class L3Interface:
         return self._number
 
     def get_netaddr(self) -> L3Addr:
-        ipAddr = L3Addr(self._addr.as_str())
+        ipAddr = self._addr.network_part_as_L3Addr(self._mask_numbits)
 
-        return ipAddr.network_part_as_L3Addr(23)    ## check how works
+        return ipAddr  ## check how works (Darren Code)
 
-
-    # CAVEMAN WAY... check with professor
     def get_directed_bcast_addr(self) -> L3Addr:
         host_mask = maskToHostMask(self._mask_numbits)
         # host_mask is all 1 bits in the host part -- which is the same as a bcast value!
-        parts = self._addr.network_part_as_L3Addr(32).as_str().split('.')
-        # parts[-1] = str(255)
 
-        host_bcast = '.'.join(parts)
-
-        print(L3Addr(host_bcast).as_str())
+        host_bcast = self.get_addr().as_int() | host_mask   # Darren code
         return L3Addr(host_bcast)
 
     def get_mask(self):

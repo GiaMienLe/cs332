@@ -1,6 +1,8 @@
 from l3addr import L3Addr
 from icecream import ic
 
+from utils import maskToHostMask, maskToInt
+
 ic.disable()
 
 
@@ -27,18 +29,22 @@ class RoutingTable:
 
         # Make sure the netaddr passed in is actually a network address -- host part
         # is all 0s.
-        # TODO: implement the code for the comment above.
+        if maskToHostMask(mask_numbits) & netaddr.as_int() != 0:
+            netaddr = L3Addr(maskToInt(mask_numbits) & netaddr.as_int()) 
 
         # Create a RoutingTableEntry and append to self._entries.
-        # TODO: implement the comment above.
+        self._entries.append(RoutingTableEntry(iface_num, netaddr, mask_numbits, nexthop, is_local))
 
+
+# Daren help
     def add_route(self, ifaces: list, netaddr: L3Addr, mask_numbits: int, nexthop: L3Addr):
         '''Add a route. Indicate a local route (no nexthop) by passing L3Addr("0.0.0.0") for nexthop'''
 
         is_local = nexthop.as_str() == "0.0.0.0"
 
-        # TODO: find the iface the nexthop address is accessible through.  raise ValueError if it
-        # is not accessible out any interface. Store iface in out_iface.
+        # find the iface the nexthop address is accessible through.  raise ValueError if it
+        #   is not accessible out any interface. Store iface in out_iface.
+        out_iface = self.get_best_route(nexthop)
 
         ic(str(out_iface))
         # Make sure the destaddr passed in is actually a network address -- host part
@@ -46,6 +52,7 @@ class RoutingTable:
         # TODO: implement, just as you did in previous method.
 
         # TODO: Create routing table entry and add to list, similar to previous method.
+        return self.add_iface_route(out_iface.iface_num, netaddr, mask_numbits, nexthop)
 
     def __str__(self):
         ret = f"RoutingTable:\n"
@@ -60,7 +67,19 @@ class RoutingTable:
     def get_best_route(self, dest: L3Addr) -> RoutingTableEntry:  # or None
         '''Use longest-prefix-match (LPM) to find and return the best route
         entry for the given dest address'''
-        # TODO: return None if no matches (which means no default route)
+        # return None if no matches (which means no default route)
+        route = None
+        
+
+        for entry in self._entries:
+            if entry.destaddr.as_int() & maskToInt(entry.mask_numbits) == dest.as_int() & maskToInt(entry.mask_numbits):
+                if route is None:
+                    route = entry
+                else:
+                    if entry.mask_numbits > route.mask_numbits:
+                        route = entry
+        
+        return route
 
 
 if __name__ == "__main__":
