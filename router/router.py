@@ -20,10 +20,6 @@ class Router:
         if the packet originated on this device). Return the interface # it was sent out,
         or None, if dropped or accepted to be processed on this host.'''
 
-        # Check the following and drop pkt if any are true:
-        #   dest on same network as packet arrived on: drop
-        # Decrement ttl and if 0, drop.
-
         #   bcast packets (including directed bcast): drop
         if pkt.dest == L3Addr('255.255.255.255'):
             print(f'Dropped {pkt}: BROADCAST PKT...')

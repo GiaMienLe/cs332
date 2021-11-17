@@ -15,7 +15,6 @@ class RoutingTableEntry:
         # if is_local is true, then nexthop value does not matter
         self.nexthop = nexthop
 
-
 class RoutingTable:
 
     def __init__(self):
@@ -47,11 +46,8 @@ class RoutingTable:
         out_iface = self.get_best_route(nexthop)
 
         ic(str(out_iface))
-        # Make sure the destaddr passed in is actually a network address -- host part
-        # is all 0s.
-        # TODO: implement, just as you did in previous method.
-
-        # TODO: Create routing table entry and add to list, similar to previous method.
+        
+        # creates routing table entry and adds to list
         return self.add_iface_route(out_iface.iface_num, netaddr, mask_numbits, nexthop)
 
     def __str__(self):

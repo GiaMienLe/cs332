@@ -18,7 +18,7 @@ class L3Interface:
     def get_netaddr(self) -> L3Addr:
         ipAddr = self._addr.network_part_as_L3Addr(self._mask_numbits)
 
-        return ipAddr  ## check how works (Darren Code)
+        return ipAddr  ## (Darren Code)
 
     def get_directed_bcast_addr(self) -> L3Addr:
         host_mask = maskToHostMask(self._mask_numbits)
@@ -71,7 +71,7 @@ if __name__ == "__main__":
     assert iface.on_same_network(L3Addr("10.10.11.3"))
     assert not iface.on_same_network(L3Addr("10.10.12.74"))
 
-    # assert iface.get_directed_bcast_addr().as_str() == "10.10.11.255"     # doesn't pass
+    assert iface.get_directed_bcast_addr().as_str() == "10.10.11.255"
     assert iface.get_netaddr().as_str() == "10.10.10.0"
 
     assert str(iface) == "Iface<1: 10.10.10.2/23>"
