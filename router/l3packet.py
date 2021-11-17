@@ -1,3 +1,12 @@
+"""
+    Layer 3 Packet Object
+
+    author: Victor Norman
+    edited: Sean Ebenmelu
+
+    11.17.2021
+"""
+
 from l3addr import L3Addr
 
 

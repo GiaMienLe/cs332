@@ -1,3 +1,14 @@
+"""
+    Routing Table
+
+    author: Victor Norman
+    edited: Sean Ebenmelu
+
+    11.17.2021
+
+    Help was gotten from Darren Rice on the marked code
+"""
+
 from l3addr import L3Addr
 from icecream import ic
 
@@ -32,10 +43,10 @@ class RoutingTable:
             netaddr = L3Addr(maskToInt(mask_numbits) & netaddr.as_int()) 
 
         # Create a RoutingTableEntry and append to self._entries.
-        self._entries.append(RoutingTableEntry(iface_num, netaddr, mask_numbits, nexthop, is_local))
+        self._entries.append(RoutingTableEntry(iface_num, netaddr, mask_numbits, nexthop, is_local))       # Darren help
 
 
-# Daren help
+    # Daren help
     def add_route(self, ifaces: list, netaddr: L3Addr, mask_numbits: int, nexthop: L3Addr):
         '''Add a route. Indicate a local route (no nexthop) by passing L3Addr("0.0.0.0") for nexthop'''
 

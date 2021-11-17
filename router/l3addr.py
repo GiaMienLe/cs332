@@ -1,4 +1,14 @@
+"""
+    Layer 3 Address
+
+    author: Victor Norman
+    edited: Sean Ebenmelu
+
+    11.17.2021
+"""
+
 from icecream import ic
+import icecream
 from utils import maskToHostMask, maskToInt
 
 # Disable debugging output
@@ -50,7 +60,6 @@ class L3Addr:
     def network_part_as_L3Addr(self, mask_numbits: int):
         return L3Addr(self.network_part_as_int(mask_numbits))
 
-    # returns the host part of the ipAdress as a Layer 3 address
     def host_part_as_L3Addr(self, mask_numbits: int):
         """ function returns a host as an IPv4 int"""
         mask = maskToHostMask(mask_numbits)
@@ -65,8 +74,9 @@ class L3Addr:
     def __str__(self):
         return f'{self._as_str}'
 
+    # checks if universal broadcast address [wasn't sure on this one]
     def is_bcast(self) -> bool:
-        return '255' in self.as_str()   ## needs to be tested
+        return self.as_str() == '255.255.255.255'
 
     def ipToInt(self, ipAddrParts):
         """ stackoverflow.com/questions/9590965/convert-an-ip-string-to-a-number-and-vice-versa
@@ -83,7 +93,7 @@ if __name__ == "__main__":
     a = L3Addr("10.11.12.13")
     assert a.as_str() == "10.11.12.13"
     assert a.as_int() == 168496141
-    assert a.is_bcast()
+    # assert a.is_bcast() == 
 
     try:
         L3Addr(2**32)
@@ -102,8 +112,7 @@ if __name__ == "__main__":
 
     assert a.host_part_as_L3Addr(16).as_str() == "0.0.12.13"
     
-    b = L3Addr("0.0.0.0")
-    assert b.as_str() == "10.11.12.13"
-    assert b.as_int() == 168496141
+    b = L3Addr("255.255.255.255")
+    assert b.is_bcast() == True
 
     print('L3Addr: all tests passed!')

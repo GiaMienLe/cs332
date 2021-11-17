@@ -1,7 +1,20 @@
+"""
+    Layer 3 Interface
+
+    author: Victor Norman
+    edited: Sean Ebenmelu
+
+    11.17.2021
+
+    Help was gotten from Darren Rice on the marked code
+"""
+
 from l3addr import L3Addr
 from utils import maskToHostMask, maskToInt
 from icecream import ic
 
+# Disable debugging output
+ic.disable()
 
 class L3Interface:
 

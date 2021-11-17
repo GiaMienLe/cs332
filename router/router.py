@@ -1,3 +1,16 @@
+"""
+    Routing
+
+    author: Victor Norman
+    edited: Sean Ebenmelu
+
+    11.17.2021
+
+    Help was gotten from Darren Rice on the marked code
+"""
+
+# package imports
+
 from l3packet import L3Packet
 from l3addr import L3Addr
 from routing_table import RoutingTable
@@ -15,6 +28,8 @@ class Router:
         # add an interface route to routing table
         self._routing_table.add_iface_route(iface.get_number(), iface.get_netaddr(), iface.get_mask(), L3Addr("0.0.0.0"))
 
+
+    # Code was by Darren Rice
     def route_packet(self, pkt: L3Packet, incoming_iface: L3Interface) -> int:
         '''Route the given packet that arrived on the given interface (iface == None
         if the packet originated on this device). Return the interface # it was sent out,
@@ -22,27 +37,27 @@ class Router:
 
         #   bcast packets (including directed bcast): drop
         if pkt.dest == L3Addr('255.255.255.255'):
-            print(f'Dropped {pkt}: BROADCAST PKT...')
+            print(f'Dropped {pkt}: because it\'s a BROADCAST PKT...')
             return None
 
-        # Get best route entry. Return the interface number of best match.
+        #   Get best route entry. Return the interface number of best match.
         entry = self._routing_table.get_best_route(pkt.dest)
         if entry == None:
             return None
 
         #   directed bcast handling: drop
         if entry.destaddr.as_int() & maskToInt(entry.mask_numbits) | (maskToHostMask(entry.mask_numbits)) == pkt.dest.as_int():
-            print(f'Dropped {pkt}: DIRECTED BROADCAST...')
+            print(f'Dropped {pkt}: because it\'s a DIRECTED BROADCAST...')
             return None     
         
-        
+        #   checks if route is empty
         if entry == None:
             print("Route Calculation Error")
             return None
 
         #   dest on same network as packet arrived on: drop
         if incoming_iface.get_number() == entry.iface_num:
-            print(f'Dropped {pkt}: dest on same network as packet arrived on...')
+            print(f'Dropped {pkt}: Destination is the same as packet\'s...')
             return None
 
         # Decrement ttl and if 0, drop.
@@ -62,14 +77,17 @@ class Router:
         print(f'{pkt} routed to interface {entry.iface_num}')
         return entry.iface_num
 
+    # adds a default route of 0.0.0.0 to routing table
     def set_default_route(self, nexthop: str):
         self._routing_table.add_route(
             self._ifaces, L3Addr("0.0.0.0"), 0, L3Addr(nexthop))
 
+    # add route to routing table
     def add_route(self, netaddr: str, mask: int, nexthop: str):
         self._routing_table.add_route(
             self._ifaces, L3Addr(netaddr), mask, L3Addr(nexthop))
 
+    # print routing table entries
     def print_routing_table(self):
         print(self._routing_table)
 
